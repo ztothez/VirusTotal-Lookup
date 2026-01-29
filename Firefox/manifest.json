@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "VirusTotal Lookup",
+  "description": "Right-click to search selected text or links on VirusTotal.",
+  "version": "2.0",
+
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+  "permissions": [
+    "contextMenus",
+    "tabs"
+  ],
+
+  "action": {
+    "default_title": "VirusTotal Lookup",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{b2c3d4e5-f6a7-8901-ab23-cd45ef678901}",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
+}

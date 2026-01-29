@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "VirusTotal Lookup",
+  "description": "Right-click to search selected text or links on VirusTotal.",
+  "version": "1.2",
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "contextMenus"
+  ],
+  "action": {
+    "default_icon": "images/icon48.png",
+    "default_title": "Check on VirusTotal"
+  }
+}
