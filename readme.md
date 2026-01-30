@@ -44,3 +44,9 @@ No background requests, telemetry, or data collection are performed.
 This project is licensed under the MIT License.
 Source code:  
 [https://github.com/ztothez/VirusTotal-Lookup](https://github.com/ztothez/VirusTotal-Lookup)
+
+## Privacy Policy
+This extension does not collect, store, or track personal data.  
+For full details, see the privacy policy below.
+
+[Privacy Policy](https://ztothez.github.io/VirusTotal-Lookup/)
