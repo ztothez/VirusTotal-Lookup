@@ -1,42 +1,13 @@
-function base64EncodeUrl(url) {
-  // Make btoa safe for Unicode
-  const bytes = new TextEncoder().encode(url);
-  let binary = "";
-  for (const b of bytes) binary += String.fromCharCode(b);
+import { base64EncodeUrl, formatUrlForVirusTotal, extractActualUrlFromGoogleRedirect } from "./utils.js";
 
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
+const SUSPICIOUS_FILE_EXTENSIONS = /\.(exe|msi|zip|rar|7z|tar|gz|dmg|pdf|doc|docx|js|jar|apk|bat|ps1|sh|iso|msix)$/i;
 
-function extractActualUrlFromGoogleRedirect(googleUrl) {
-  try {
-    const urlObj = new URL(googleUrl);
+function handleDirectDownloadLink(url) {
+  if (!SUSPICIOUS_FILE_EXTENSIONS.test(url)) return false;
 
-    // /url?url=... or /url?q=...
-    if (urlObj.pathname === "/url") {
-      const param = urlObj.searchParams.get("url") || urlObj.searchParams.get("q");
-      if (param) {
-        const extractedUrl = decodeURIComponent(param);
-        if (/(google\.com|shopping|aclk)/i.test(extractedUrl)) return null;
-        return extractedUrl;
-      }
-    }
-
-    // /aclk?adurl=...
-    if (urlObj.pathname === "/aclk") {
-      const adUrl = urlObj.searchParams.get("adurl") || urlObj.searchParams.get("q");
-      if (!adUrl) return null;
-      const extractedUrl = decodeURIComponent(adUrl);
-      if (/(google\.com|shopping)/i.test(extractedUrl)) return null;
-      return extractedUrl;
-    }
-
-    // generic q=
-    if (urlObj.searchParams.has("q")) {
-      return decodeURIComponent(urlObj.searchParams.get("q"));
-    }
-  } catch (_) {}
-
-  return null;
+  const encodedUrl = base64EncodeUrl(url);
+  browser.tabs.create({ url: `https://www.virustotal.com/gui/url/${encodedUrl}/detection` });
+  return true;
 }
 
 function getVirusTotalUrl(inputRaw) {
@@ -48,32 +19,25 @@ function getVirusTotalUrl(inputRaw) {
   const domainOnlyRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const urlRegex = /^https?:\/\/[^\s]+$/i;
 
+  const value = input.includes(" ") ? formatUrlForVirusTotal(input) : input;
+
   // Hash
-  if (hashRegex.test(input)) return `https://www.virustotal.com/gui/file/${input}`;
+  if (hashRegex.test(value)) return `https://www.virustotal.com/gui/file/${value}`;
 
   // IP
-  if (ipRegex.test(input)) return `https://www.virustotal.com/gui/ip-address/${input}`;
+  if (ipRegex.test(value)) return `https://www.virustotal.com/gui/ip-address/${value}`;
 
   // Full URL
-  if (urlRegex.test(input)) {
-    const encodedUrl = base64EncodeUrl(input);
+  if (urlRegex.test(value)) {
+    const encodedUrl = base64EncodeUrl(value);
     return `https://www.virustotal.com/gui/url/${encodedUrl}/detection`;
   }
 
   // Bare domain
-  if (domainOnlyRegex.test(input)) return `https://www.virustotal.com/gui/domain/${input}`;
+  if (domainOnlyRegex.test(value)) return `https://www.virustotal.com/gui/domain/${value}`;
 
   // Fallback: VT search (better for CVEs, keywords, etc.)
-  return `https://www.virustotal.com/gui/search/${encodeURIComponent(input)}`;
-}
-
-function handleDirectDownloadLink(url) {
-  const fileExtensions = /\.(exe|msi|zip|rar|7z|tar|gz|dmg|pdf|doc|docx)$/i;
-  if (!fileExtensions.test(url)) return false;
-
-  const encodedUrl = base64EncodeUrl(url);
-  browser.tabs.create({ url: `https://www.virustotal.com/gui/url/${encodedUrl}/detection` });
-  return true;
+  return `https://www.virustotal.com/gui/search/${encodeURIComponent(value)}`;
 }
 
 const MENU_ID = "searchVirusTotal";
@@ -105,4 +69,11 @@ browser.contextMenus.onClicked.addListener((info) => {
   if (!queryUrl) return;
 
   browser.tabs.create({ url: queryUrl });
+});
+
+// Toolbar icon click: scan the current tab's URL directly
+browser.action.onClicked.addListener((tab) => {
+  if (!tab || !tab.url) return;
+  const queryUrl = getVirusTotalUrl(tab.url);
+  if (queryUrl) browser.tabs.create({ url: queryUrl });
 });

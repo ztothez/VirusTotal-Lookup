@@ -1,0 +1,4 @@
+# Packaged browser extension build artifacts
+*.crx
+*.zip
+*.pem

@@ -17,19 +17,30 @@ VirusTotal Lookup is an open-source browser extension for quickly searching indi
     Extracts the real destination from Google redirect URLs before searching.
     
 - **Direct download detection**  
-    Identifies direct file download URLs to ensure accurate VirusTotal lookups.
-    
+    Identifies direct file download URLs (now including `.js`, `.jar`, `.apk`, `.bat`, `.ps1`, `.sh`, `.iso`, `.msix`) to ensure accurate VirusTotal lookups.
+
+- **One-click current-tab scan**  
+    Click the toolbar icon to send the active tab's URL straight to VirusTotal.
+
+## What's New (v1.3 / 2.1)
+* Unicode-safe URL encoding (previously non-Latin1 URLs could fail to open on Chrome)
+* Smarter Google-redirect detection shared between both builds
+* Unmatched input now falls back to a VirusTotal search instead of a misleading domain-page guess
+* Expanded list of flagged download extensions
+* New: clicking the toolbar icon scans the current tab's URL directly
 
 ## Usage
 1. Highlight text or right-click a link.
 2. Select **Search on VirusTotal**.
 3. Review existing VirusTotal results in a new browser tab.
 
+Alternatively, click the toolbar icon to scan the page you're currently on.
+
 **Note:** This extension does not upload files or initiate scans automatically.
 
 ## Permissions
 - **Context menus**
-- **Tabs**
+- **Tabs / activeTab**
 
 No background requests, telemetry, or data collection are performed.
 
